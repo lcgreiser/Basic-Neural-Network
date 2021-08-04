@@ -5,21 +5,17 @@ class NeuralNet:
 
     def __init__(self):
         self.layers = []
-        self.layer_outputs = None
-        self.net_output = None
+        self.x = None
 
     def forward(self, x: np.ndarray):
-        self.layer_outputs = []
+        self.x = x
         for layer in self.layers:
-            self.layer_outputs.append(x)
             x = layer.forward(x)
-        self.net_output = x
         return x
 
     def backward(self, y: np.ndarray, lr: float):
-        e = self.net_output - y  # todo: implement criterion
-        for layer, layer_outputs in zip(self.layers[::-1], self.layer_outputs[::-1]):
-            e = layer.backward(e, layer_outputs, lr)
+        for layer in self.layers[::-1]:
+            layer.backward(self.x, y, lr)
 
     def adjust_weights(self):
         for layer in self.layers:
@@ -27,6 +23,9 @@ class NeuralNet:
 
     def add_layer(self, layer):
         self.layers.append(layer)
+        if len(self.layers) > 1:
+            self.layers[-2].next_layer = self.layers[-1]
+            self.layers[-1].previous_layer = self.layers[-2]
 
     def train(self, x_train, y_train, num_epochs, batch_size, lr, shuffle):
         num_train_samples = len(x_train)
@@ -52,3 +51,4 @@ class NeuralNet:
             if idx >= num_train_samples:
                 idx -= num_train_samples
                 print("error:", np.mean((y_pred - y_batch)**2))  # todo: criterion
+                epoch += 1
