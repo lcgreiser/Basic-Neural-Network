@@ -1,4 +1,5 @@
 import math
+from typing import Type
 
 import numpy as np
 
@@ -7,7 +8,7 @@ from activations import ActivationFunction
 
 class Linear:
 
-    def __init__(self, num_inp: int, num_out: int, activation_function: ActivationFunction):
+    def __init__(self, num_inp: int, num_out: int, activation_function: Type[ActivationFunction]):
         xavier_range = 1/math.sqrt(num_inp)
         self.weights = np.random.uniform(low=-xavier_range, high=xavier_range, size=(num_out, num_inp+1))
         self.activation_function = activation_function

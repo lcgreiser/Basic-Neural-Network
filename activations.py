@@ -46,6 +46,22 @@ class Softmax(ActivationFunction):
 
     @staticmethod
     def local_gradient(layer, y):
-        assert layer.next_layer is None, "Softmax activation should only be used on last layer."
-        local_gradient = layer.output - y
+        assert layer.next_layer is None, "Softmax activation should only be used on last layer."  # todo: remove
+        local_gradient = layer.output - y  # todo: incorrect
+        return local_gradient
+
+
+class LogSoftmax(ActivationFunction):
+
+    @staticmethod
+    def forward(x):
+        shift_x = np.max(x)
+        exp_x = np.exp(x - shift_x)
+        sum_exp_x = np.sum(exp_x, axis=1)
+        return np.log(exp_x / sum_exp_x.reshape(-1, 1))
+
+    @staticmethod
+    def local_gradient(layer, y):
+        assert layer.next_layer is None, "Softmax activation should only be used on last layer."  # todo: remove
+        local_gradient = np.exp(layer.output) - y
         return local_gradient
